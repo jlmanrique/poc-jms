@@ -1,0 +1,1 @@
+podman build -t reniec-mq-demo:1.0 .
