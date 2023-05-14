@@ -1,45 +1,57 @@
 package org.acme;
 
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-
 import org.apache.camel.component.jms.JmsComponent;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-import com.ibm.mq.jms.MQQueueConnectionFactory;
-import com.ibm.msg.client.jms.JmsConnectionFactory;
-import com.ibm.msg.client.jms.JmsConstants;
-import com.ibm.msg.client.jms.JmsFactoryFactory;
-import com.ibm.msg.client.wmq.WMQConstants;
-import com.ibm.msg.client.wmq.common.CommonConstants;
+import com.ibm.msg.client.jakarta.jms.JmsConnectionFactory;
+import com.ibm.msg.client.jakarta.jms.JmsConstants;
+import com.ibm.msg.client.jakarta.jms.JmsFactoryFactory;
+import com.ibm.msg.client.jakarta.wmq.WMQConstants;
+import com.ibm.msg.client.jakarta.wmq.common.CommonConstants;
 
-import io.quarkus.arc.DefaultBean;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Default;
 import jakarta.enterprise.inject.Produces;
+import jakarta.jms.ConnectionFactory;
+import jakarta.jms.JMSException;
 
+@ApplicationScoped
 public class ApplicationContext {
 
-    /**
-     * @return
-     * @throws JMSException
-     */
+    @ConfigProperty(name = "app.jms.host")
+    private String host;
+
+    @ConfigProperty(name = "app.jms.port")
+    private int port;
+
+    @ConfigProperty(name = "app.jms.channel")
+    private String channel;
+
+    @ConfigProperty(name = "app.jms.queuemgr")
+    private String queuemgr;
+
+    @ConfigProperty(name = "app.jms.user")
+    private String user;
+
+    @ConfigProperty(name = "app.jms.password")
+    private String password;
+
     @Produces
-    @ApplicationScoped
-    @DefaultBean
+    @Default
     public ConnectionFactory connectionFactory() throws JMSException {
         
         JmsFactoryFactory ff;
         JmsConnectionFactory factory;
-        try {
-            
-            ff = JmsFactoryFactory.getInstance(JmsConstants.WMQ_PROVIDER);
+        try {        
+            ff = JmsFactoryFactory.getInstance(JmsConstants.JAKARTA_WMQ_PROVIDER);
             factory = ff.createConnectionFactory();
             factory.setIntProperty(CommonConstants.WMQ_CONNECTION_MODE, CommonConstants.WMQ_CM_CLIENT);
-            factory.setStringProperty(CommonConstants.WMQ_HOST_NAME, "localhost");
-            factory.setIntProperty(CommonConstants.WMQ_PORT, 1414);
-            factory.setStringProperty(CommonConstants.WMQ_CHANNEL, "DEV.APP.SVRCONN");
-            factory.setStringProperty(CommonConstants.WMQ_QUEUE_MANAGER, "QM1");
-            factory.setStringProperty(WMQConstants.USERID, "app");
-            factory.setStringProperty(WMQConstants.PASSWORD, "passw0rd");
+            factory.setStringProperty(CommonConstants.WMQ_HOST_NAME, this.host);
+            factory.setIntProperty(CommonConstants.WMQ_PORT, this.port);
+            factory.setStringProperty(CommonConstants.WMQ_CHANNEL, this.channel);
+            factory.setStringProperty(CommonConstants.WMQ_QUEUE_MANAGER, this.queuemgr);
+            factory.setStringProperty(WMQConstants.USERID, this.user);
+            factory.setStringProperty(WMQConstants.PASSWORD, this.password);
             factory.setBooleanProperty(WMQConstants.USER_AUTHENTICATION_MQCSP, true);
         } catch (JMSException je) {
             throw je;
@@ -49,9 +61,8 @@ public class ApplicationContext {
 
     
     @Produces
-    @ApplicationScoped
-    @DefaultBean
-    public JmsComponent mq() throws JMSException {
+    @Default
+    public JmsComponent jms() throws JMSException {
       JmsComponent jmsComponent = new JmsComponent();
       jmsComponent.setConnectionFactory(connectionFactory());
       return jmsComponent;
