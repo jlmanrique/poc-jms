@@ -1,0 +1,10 @@
+FROM mariadb:latest
+
+# Copiar el script SQL a la imagen
+COPY init-db.sql /docker-entrypoint-initdb.d/
+
+# Variables de entorno para inicializar la base de datos
+ENV MYSQL_ROOT_PASSWORD=password
+ENV MYSQL_DATABASE=ciudadanos
+
+EXPOSE 3306

@@ -18,6 +18,8 @@ bin/
 *.iml
 *.iws
 
+.task
+
 # NetBeans
 nb-configuration.xml
 

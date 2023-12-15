@@ -34,7 +34,7 @@ public class GreetingResource {
         Queue destination = session.createQueue(queue);
         MessageProducer producer = session.createProducer(destination);
 
-        TextMessage message = session.createTextMessage("Hola Denis!!!");
+        TextMessage message = session.createTextMessage("DNI-23456789");
         message.setStringProperty("_Destination", destination.toString());
         producer.send(message);
 

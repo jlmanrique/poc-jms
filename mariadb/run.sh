@@ -1,0 +1,1 @@
+podman run -d --name=mariadb -p 3306:3306 mariadb-demo:1.0

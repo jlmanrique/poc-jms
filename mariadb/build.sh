@@ -1,0 +1,1 @@
+podman build -t mariadb-demo:1.0 .

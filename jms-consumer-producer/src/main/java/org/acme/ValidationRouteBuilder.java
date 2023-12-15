@@ -16,7 +16,7 @@ public class ValidationRouteBuilder extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        from(String.format("jms:queue:%s",queue_in))
+        from(String.format("jms:queue:%s?concurrentConsumers=50",queue_in))
             .log("Received a message - ${body} - sending to validated")
         .to(String.format("jms:queue:%s",queue_out));
     }

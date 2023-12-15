@@ -2,6 +2,7 @@ package org.acme;
 
 import org.apache.camel.component.jms.JmsComponent;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jdbi.v3.core.Jdbi;
 
 import com.ibm.msg.client.jakarta.jms.JmsConnectionFactory;
 import com.ibm.msg.client.jakarta.jms.JmsConstants;
@@ -9,14 +10,20 @@ import com.ibm.msg.client.jakarta.jms.JmsFactoryFactory;
 import com.ibm.msg.client.jakarta.wmq.WMQConstants;
 import com.ibm.msg.client.jakarta.wmq.common.CommonConstants;
 
+import io.agroal.api.AgroalDataSource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Default;
 import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSException;
 
 @ApplicationScoped
 public class ApplicationContext {
+
+    @Inject
+    AgroalDataSource dataSource;
 
     @ConfigProperty(name = "app.jms.host")
     private String host;
@@ -66,6 +73,13 @@ public class ApplicationContext {
       JmsComponent jmsComponent = new JmsComponent();
       jmsComponent.setConnectionFactory(connectionFactory());
       return jmsComponent;
+    }
+
+    @Singleton
+    @Produces
+    public Jdbi jdbi() {
+        Jdbi jdbi = Jdbi.create(dataSource);
+        return jdbi;
     }
 
 }
